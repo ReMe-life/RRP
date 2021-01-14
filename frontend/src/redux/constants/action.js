@@ -1,0 +1,9 @@
+export const DO_LOGIN = "DO_LOGIN";
+export const USER_DETAILS = "USER_DETAILS";
+export const USER_BALANCE = "USER_BALANCE";
+export const USER_UID = "USER_UID";
+export const CREDIT_HISTORY = "CREDIT_HISTORY";
+export const REFERRAL_TEAM = "REFERRAL_TEAM";
+export const USER_INCOME = "USER_INCOME";
+export const REFERRAL_CODE = "REFERRAL_CODE";
+export const USER_TOKEN = "USER_TOKEN";

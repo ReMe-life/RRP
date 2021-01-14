@@ -1,0 +1,546 @@
+/*Now the CSS*/
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.tree ul {
+  padding-top: 20px;
+  position: relative;
+
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.tree li {
+  float: left;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 5px 0 5px;
+
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/*We will use ::before and ::after to draw the connectors*/
+
+.tree li::before,
+.tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 1px solid #ccc;
+  width: 50%;
+  height: 20px;
+}
+.tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 1px solid #ccc;
+}
+
+/*We need to remove left-right connectors from elements without 
+any siblings*/
+.tree li:only-child::after,
+.tree li:only-child::before {
+  display: none;
+}
+
+/*Remove space from the top of single children*/
+.tree li:only-child {
+  padding-top: 0;
+}
+
+/*Remove left connector from first child and 
+right connector from last child*/
+.tree li:first-child::before,
+.tree li:last-child::after {
+  border: 0 none;
+}
+/*Adding back the vertical connector to the last nodes*/
+.tree li:last-child::before {
+  border-right: 1px solid #ccc;
+  border-radius: 0 5px 0 0;
+  -webkit-border-radius: 0 5px 0 0;
+  -moz-border-radius: 0 5px 0 0;
+}
+.tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+  -webkit-border-radius: 5px 0 0 0;
+  -moz-border-radius: 5px 0 0 0;
+}
+
+/*Time to add downward connectors from parents*/
+.tree ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid #ccc;
+  width: 0;
+  height: 20px;
+}
+
+.tree li a {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #666;
+  font-family: arial, verdana, tahoma;
+  font-size: 11px;
+  display: inline-block;
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/*Time for some hover effects*/
+/*We will apply the hover effect the the lineage of the element also*/
+.tree li a:hover,
+.tree li a:hover + ul li a {
+  background: #c8e4f8;
+  color: #000;
+  border: 1px solid #94a0b4;
+}
+/*Connector styles on hover*/
+.tree li a:hover + ul li::after,
+.tree li a:hover + ul li::before,
+.tree li a:hover + ul::before,
+.tree li a:hover + ul ul::before {
+  border-color: #94a0b4;
+}
+
+/* referred UserTree */
+.refUserTree {
+  display: block;
+  margin-left: 15px;
+}
+.refUserTree h5 {
+  text-align: left;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+.refUserTree .levelSec li {
+  list-style: none;
+  margin-bottom: 7px;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.refUserTree .levelSec li:last-child {
+  margin-bottom: 0;
+}
+.refUserTree .levelSec {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  margin-bottom: 0;
+  min-height: 400px;
+}
+.refUserTree .levelSec li a {
+  width: 77px;
+  height: 77px;
+  border-radius: 100px;
+  background: #d7746f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  margin-left: 25px;
+  transition: all ease-in-out 0.2s;
+}
+.refUserTree .levelSec li a:hover {
+  color: #ffffff;
+  box-shadow: 0 0 0 3px #fbccca;
+  transition: all ease-in-out 0.2s;
+}
+.refUserTree .levelSec li span {
+  color: #333333;
+  font-size: 16px;
+  font-weight: 600;
+}
+.refUserTree .row {
+  min-height: 592px;
+}
+.refUserTree .treeDiv .referedUser {
+  max-width: 275px;
+  box-shadow: 1px 0 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+.refUserTree .treeDiv .headSec {
+  background: #56a7ad;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.refUserTree .treeDiv .headSec img {
+  cursor: pointer;
+  z-index: 1;
+  position: relative;
+}
+.refUserTree .treeDiv .headSec .sorting {
+  position: relative;
+  z-index: 1;
+  transition: all ease 0.4s;
+}
+.refUserTree .treeDiv .headSec .sorting:hover::before {
+  background: #3a8287;
+  border-radius: 100px;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  content: "";
+  z-index: 0;
+  transition: all ease 0.4s;
+}
+.refUserTree .treeDiv {
+  align-self: baseline;
+  padding-bottom: 43px;
+}
+.refUserTree .treeDiv .bodySec {
+  background: #ffffff;
+  padding: 15px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  min-height: 380px;
+}
+.refUserTree .treeDiv .bodySec .scrollbar-container {
+  max-height: 320px;
+}
+.nested.level4 {
+  margin: 0 2px;
+}
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y,
+.ps__thumb-y {
+  width: 4px !important;
+  background-color: #cce4e6 !important;
+}
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+  background: transparent !important;
+}
+.ps__rail-y {
+  width: 8px;
+}
+.refUserTree .treeDiv .bodySec input {
+  background: #e5f1f2;
+  border-radius: 100px;
+  padding: 8px 15px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333333;
+  border: solid 1px #e5f1f2;
+  transition: all ease 0.2s;
+  width: 100%;
+  margin-bottom: 15px;
+}
+.refUserTree .treeDiv .bodySec input:hover {
+  border-color: #56a7ad;
+  transition: all ease 0.2s;
+  outline: none;
+}
+.refUserTree .treeDiv .bodySec .userList {
+  margin-bottom: 0;
+}
+.refUserTree .treeDiv .bodySec .userList li {
+  list-style: none;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333333;
+  margin-bottom: 14px;
+}
+.refUserTree .treeDiv .headSec h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+.refUserTree .treeSec .visualizer-container {
+  flex: 1 1;
+  display: flex;
+  max-width: 545px;
+  overflow: hidden;
+}
+.refUserTree .treeSec .visualizer-container li {
+  list-style: none;
+  flex: 1 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.refUserTree .treeSec .visualizer-container li .nested {
+  display: flex;
+}
+/* .refUserTree .treeSec .visualizer-container li .nested ul {
+  margin-top: 5%;
+} */
+.refUserTree .treeSec {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+.refUserTree .treeSec .visualizer-container.level1 span {
+  position: relative;
+  flex: 1 1;
+  min-height: 16vh;
+  /* width: 50%;
+  margin: 0 auto; */
+}
+.refUserTree .treeSec .visualizer-container .level4 span {
+  min-height: auto !important;
+}
+.refUserTree .treeSec .visualizer-container.level1 .level1Icon::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/level1leftLine.png") no-repeat;
+  background-position: center center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  left: -10%;
+  top: 8px;
+}
+.refUserTree .treeSec .visualizer-container.level1 .subline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/sublineLft.png") no-repeat;
+  background-position: center center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  left: -14%;
+  top: 21px;
+}
+.refUserTree .treeSec .visualizer-container.level1 .nestedSubline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/nestedSublineLft.png") no-repeat;
+  background-position: center center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  left: -17%;
+  top: 11px;
+}
+.refUserTree .treeSec .visualizer-container.level1 .nestedSubline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/nestedSublineRgt.png") no-repeat;
+  background-position: center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  right: -17%;
+  top: 11px;
+  left: auto;
+}
+.refUserTree .treeSec .visualizer-container.level1 .subline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/sublineRgt.png") no-repeat;
+  background-position: center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  right: -14%;
+  top: 21px;
+  left: auto;
+}
+.refUserTree .treeSec .visualizer-container.level1 .level1Icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  background: url("../../assets/img/level1RgtLine.png") no-repeat;
+  background-position: center center;
+  /* background-size: cover; */
+  width: 100%;
+  height: 100%;
+  right: -10%;
+  top: 8px;
+  left: auto;
+}
+.refUserTree
+  .treeSec
+  .visualizer-container
+  li
+  .nested.level4
+  li:first-child
+  span {
+  text-align: left;
+}
+.refUserTree
+  .treeSec
+  .visualizer-container
+  li
+  .nested.level4
+  li:last-child
+  span {
+  text-align: right;
+}
+.refUserTree .treeSec .visualizer-container img {
+  z-index: 1;
+  position: relative;
+  max-width: 100%;
+}
+
+@media (max-width: 1366px) {
+  .refUserTree {
+    margin-left: 0;
+  }
+  .nested.level4 {
+    margin: 0 1px;
+  }
+  .paddingGraph {
+    padding: 60px 15px;
+  }
+  .refUserTree .row {
+    min-height: 500px;
+  }
+  .refUserTree .levelSec li a {
+    width: 70px;
+    height: 70px;
+    font-size: 13px;
+    margin-left: 15px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .nestedSubline::before {
+    left: -13%;
+    top: 11px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .nestedSubline::after {
+    right: -13%;
+    top: 11px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .subline::after {
+    right: -12%;
+    top: 12px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .subline::before {
+    left: -12%;
+    top: 12px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::before {
+    top: 13px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::after {
+    top: 13px;
+  }
+}
+@media (max-width: 1180px) {
+  .refUserTree h5 {
+    font-size: 16px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::after,
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::before {
+    top: 18px;
+  }
+  .refUserTree .levelSec li span {
+    font-size: 14px;
+  }
+}
+@media (max-width: 991px) {
+  .sidebar {
+    position: absolute;
+  }
+}
+@media (max-width: 767px) {
+  .refUserTree .treeDiv .referedUser {
+    margin: 0px auto;
+  }
+  .refUserTree .treeSec .visualizer-container {
+    margin: 0 auto;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::before {
+    top: 13px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level1Icon::after {
+    top: 13px;
+  }
+  .treeDiv {
+    border-right: none;
+  }
+  .refUserTree h5 {
+    text-align: center;
+  }
+  .refUserTree .treeSec {
+    order: 2;
+  }
+  .refUserTree .levelSec {
+    order: 1;
+    margin-bottom: 15px;
+  }
+  .refUserTree .treeSec {
+    margin-bottom: 30px;
+  }
+  .refUserTree .treeDiv {
+    order: 3;
+  }
+}
+@media (max-height: 768px) {
+  .refUserTree .treeSec .visualizer-container.level1 span {
+    min-height: 16vh;
+  }
+  .refUserTree .levelSec {
+    max-height: 480px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level3 span {
+    min-height: 14vh;
+  }
+}
+@media (max-width: 480px) {
+  .refUserTree .treeSec .visualizer-container.level1 span {
+    min-height: 10vh;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .nestedSubline::after {
+    right: -8%;
+    top: 12px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .nestedSubline::before {
+    left: -8%;
+    top: 12px;
+  }
+  .refUserTree .treeSec .visualizer-container.level1 .level3 span {
+    min-height: 12vh;
+  }
+}
+
+a.isBtnActive {
+  box-shadow: 0px 0px 2px 6px rgba(0,0,0,0.12);
+  background: #56a7ad !important;
+  border: 2px solid #CCC;
+}
