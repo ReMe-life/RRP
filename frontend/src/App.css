@@ -39,3 +39,29 @@
 a.navbar-brand.logo img {
   width: 200px;
 }
+@media(min-width:767px){
+.siteTitle_style {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 0;
+  display: inline-block;
+  width: 283px;
+  margin: 0 auto;
+}
+}
+.sidebar-wrapper ul.nav li.nav-item{
+  padding:0px !important;
+}
+.sidebar .sidebar-wrapper .nav li a{
+  margin: 0px;
+  padding:10px 15px;
+}
+.copyBlock{
+  position: relative;
+}
+span.copied {
+  position: absolute;
+  left: 44px;
+  bottom: 124%;
+}

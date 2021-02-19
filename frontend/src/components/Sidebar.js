@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import history from "../history";
 import store from '../redux/store';
 import * as ReferralService from "../services/referral.sevice";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'react-redux';
-
+import {
+    FacebookShareButton,
+    FacebookIcon
+} from "react-share";
 export class Sidebar extends Component {
     constructor(props) {
         super(props)
@@ -17,7 +20,7 @@ export class Sidebar extends Component {
 
     goToUrl = (url) => {
         history.push({
-            pathname: url + '/' + this.getUserToken()
+            pathname: url
         });
     }
 
@@ -33,15 +36,22 @@ export class Sidebar extends Component {
             <div className="sidebar">
                 <div className="sidebar-wrapper">
                     <ul className="nav">
-                        <li className="nav-item active">
-                            <Link onClick={() => this.goToUrl('/home')} activeClassName="active"><i className="fas fa-tv"></i><p >Dashboard</p></Link>
+                        <li className="nav-item">
+                            <NavLink to={'/home?authtoken=' + encodeURIComponent(this.getUserToken())} activeClassName="active"><i className="fas fa-tv"></i><p >Dashboard</p></NavLink>
                         </li>
                         <li className="nav-item">
-                            <Link onClick={() => this.goToUrl('/team')} activeClassName="active"><i className="fa fa-sitemap tim-icons"></i><p >My Network</p></Link>
+                            <NavLink to={'/team?authtoken=' + encodeURIComponent(this.getUserToken())} activeClassName="active"><i className="fa fa-sitemap tim-icons"></i><p >My Network</p></NavLink>
                         </li>
                     </ul>
+
                     <div className="container affliateLinkGroup">
                         <div className="row">
+                            <a href="https://reme-wallet-test.web.app/" target="_blank" className="col-md-12 inner-group c-p">
+                                <h4 >View Wallet</h4>
+                            </a></div></div>
+                    <div className="container affliateLinkGroup">
+                        <div className="row">
+
                             <div className="col-md-12 inner-group">
                                 <h4 >Invitation Link</h4>
                                 <p className="userInfo">{refferalCode}</p>
@@ -50,11 +60,6 @@ export class Sidebar extends Component {
                                 </CopyToClipboard>
                                 {copied ? <span style={{ color: 'blue' }}>Copied.</span> : null}
                             </div></div></div>
-                    <div className="container affliateLinkGroup">
-                        <div className="row">
-                            <a href="https://reme-wallet-test.web.app/" target="_blank" className="col-md-12 inner-group c-p">
-                                <h4 >View Wallet</h4>
-                            </a></div></div>
                 </div>
             </div>
         )

@@ -86,13 +86,10 @@ export const verifyToken = async (body) => {
 };
 
 export const getUserInfo = async (id) => {
-    return axios.get(`https://reme.onlinedemo.space:8492/users/` + id,
-        {
-            headers: {
-                Authorization: getJWT()
-            }
+    return await api
+        .getReq(routes.getUserDetails + '/' + id)
+        .then((response) => {
+            return response;
         })
-        .then(res => {
-            return res;
-        })
+        .catch((err) => { });
 };

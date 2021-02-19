@@ -83,7 +83,7 @@ h4 {
   color: #fff !important;
 }
 .sidebar .sidebar-wrapper .nav li:hover {
-  background: #56a7ad;
+  background: #d7746f;
   color: #fff;
 }
 .sidebar .sidebar-wrapper .nav li a:hover {
@@ -99,12 +99,12 @@ h4 {
   line-height: 30px;
   width: 34px;
   text-align: center;
-  color: #707d8a !important;
+  color: #707d8a;
   position: relative;
 }
 
 .sidebar .sidebar-wrapper .nav li a p {
-  color: #707d8a !important;
+  color: #707d8a;
   font-weight: 400;
   font-size: 14px;
   line-height: 30px;
@@ -164,9 +164,9 @@ p.welcome-line .red-text {
   border-radius: 5px;
 }
 
-.bar-info-col .income-info-btns {
+.income-info-btns {
   margin-right: 10px;
-  height: auto;
+  height: 50px;
   width: auto;
   display: inline-block;
   border-radius: 4px;
@@ -178,7 +178,7 @@ p.welcome-line .red-text {
 span.white-text {
   color: #fff;
 }
-.bar-info-col .income-info-btns.light-pink-bg {
+.income-info-btns.light-pink-bg {
   background: #56a7ad;
 }
 
@@ -464,4 +464,33 @@ i.fa.fa-copy {
 }
 .c-p{
   cursor: pointer;
+}
+
+.text-info{
+  color: #56a7ad;
+}
+
+i.fa.fa-share-alt.fa-lg.mr-2 {
+  cursor: pointer;
+  color: #a7a2a2;
+}
+
+.copied{
+  color: green;
+  font-weight: 600;
+}
+.socialIcon{
+  margin: 0 5px;
+}
+
+.sidebar-wrapper .active {
+  background: #d7746f;
+}
+
+.active p,.active i{
+  color: #fff !important
+}
+
+.levelSpan{
+  font-size: 13px;
 }

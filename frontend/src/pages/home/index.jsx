@@ -26,7 +26,7 @@ class Home extends React.Component {
                 <div className="container-fluid top-header">
                     <nav className="navbar navbar-expand-lg navbar-light ">
                         <a className="navbar-brand logo" href="#"><img src={logo} /></a>
-                        <div>
+                        <div className="siteTitle_style">
                             <span className="heading">ReMe Referral Program</span>
                         </div>
                         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,8 +49,8 @@ class Home extends React.Component {
                     <Sidebar />
                     <div className="main-panel">
                         <Switch >
-                            <Route exact path='/team/:uid' exact component={Team} />
-                            <Route exact path='/home/:uid' component={Dashboard} />
+                            <Route exact path='/team' exact component={Team} />
+                            <Route exact path='/home' component={Dashboard} />
                         </Switch>
                     </div>
                 </div>

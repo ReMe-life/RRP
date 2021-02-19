@@ -272,7 +272,7 @@ right connector from last child*/
 .refUserTree .treeDiv .bodySec .userList {
   margin-bottom: 0;
 }
-.refUserTree .treeDiv .bodySec .userList li {
+.refUserTree .treeDiv .bodySec .userList li,.you {
   list-style: none;
   font-size: 12px;
   font-weight: 400;
@@ -543,4 +543,10 @@ a.isBtnActive {
   box-shadow: 0px 0px 2px 6px rgba(0,0,0,0.12);
   background: #56a7ad !important;
   border: 2px solid #CCC;
+}
+.all,.all:hover{
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  color: #fff;
 }

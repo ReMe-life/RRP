@@ -1,7 +1,7 @@
 const hostname = window.location.hostname;
 
 const api = {
-  localhost: "http://10.1.1.33:3002/",
+  localhost: "http://localhost:8080/",
   platform: "https://ws-remelife.s6.staging-host.com/"
 };
 

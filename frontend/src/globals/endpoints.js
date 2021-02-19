@@ -10,3 +10,4 @@ export const getLevelUsers = "getLevelUsers";
 export const getTotalIncome = "getTotalIncome";
 export const getReferralCode = "getUserReferralCode";
 export const verifyToken = "verifyToken";
+export const getUserDetails = "getUserDetails"

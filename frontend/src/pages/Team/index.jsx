@@ -13,7 +13,7 @@ import Loader from '../../components/loader';
 import sortIcon from '../../assets/img/sortingIcon.png';
 import level1Icon from '../../assets/img/level1Icon.png';
 import level2Icon from '../../assets/img/level2Icon.png';
-
+const queryString = require('query-string');
 var _ = require('lodash');
 
 export class Team extends Component {
@@ -36,11 +36,12 @@ export class Team extends Component {
     }
 
     componentWillMount = async () => {
-        let token = this.props.match.params.uid;
+        let token = queryString.parse(window.location.search).authtoken
         this.props.setUserToken(token);
         let body = {
             jwt: token
         }
+        this.setState({ loaded: false })
         await ReferralService.verifyToken(body)
             .then(async (response) => {
                 response = response.data;
@@ -204,15 +205,22 @@ export class Team extends Component {
     createRefferalTeamList = async (index) => {
         const { refferalTeamList } = this.state;
         if (refferalTeamList.length > index) {
-            await this.getUserInfo(refferalTeamList[index].from_user)
-                .then((full_name) => {
-                    refferalTeamList[index].full_name = full_name + '( level ' + refferalTeamList[index].level + ' )'
-                    this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
-                    this.createRefferalTeamList(index + 1)
-                })
-                .catch((err) => {
-                    // showNotification("danger", ERRORMSG);
-                });
+            if (refferalTeamList[index].level === 1) {
+                await this.getUserInfo(refferalTeamList[index].from_user)
+                    .then((full_name) => {
+                        refferalTeamList[index].full_name = full_name + '(' + refferalTeamList[index].referredCount + ' referred)'
+                        this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
+                        this.createRefferalTeamList(index + 1)
+                    })
+                    .catch((err) => {
+                        // showNotification("danger", ERRORMSG);
+                    });
+            } else {
+                refferalTeamList[index].full_name = 'User-' + refferalTeamList[index].from_user.split('-')[4] + '(' + refferalTeamList[index].referredCount + ' referred)'
+                this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
+                this.createRefferalTeamList(index + 1)
+            }
+
         }
     }
 
@@ -232,7 +240,8 @@ export class Team extends Component {
     getUserInfo = async (id) => {
         return await ReferralService.getUserInfo(id)
             .then(async (response) => {
-                if (response.status === 200) {
+                if (response.status === 200 && response.data.success) {
+                    response = response.data
                     let full_name = response.data.firstname + ' ' + response.data.lastname
                     return full_name
                 } else {
@@ -285,20 +294,25 @@ export class Team extends Component {
 
                 <div className="row">
                     <div className="col-md-3 text-left treeDiv">
-                        <h5>Referred user tree</h5>
+                        <h5>Your Network</h5>
                         <div className="referedUser">
                             <div className="headSec">
                                 <h2>Referred Users</h2>
-                                <a className="sorting"><img src={sortIcon} alt="icon" /></a>
+                                <span className="all" onClick={() => this.componentWillMount()}>All</span>
                             </div>
                             <div className="bodySec">
                                 <input type="text" placeholder="Search" onChange={(e) => this.search(e)} />
+                                <span className="levelSpan"> Level : 0</span> <br />
+                                <span className="levelSpan you" > You</span>
                                 <PerfectScrollbar>
                                     <ul className="userList p-1">
                                         {loaded ? refferalTeamListToShow.length ? refferalTeamListToShow.map((item, index) =>
-                                            <tr key={index}>
-                                                <li>{item.full_name}</li>
-                                            </tr>
+                                            <>
+                                                <span className="levelSpan"> {index !== 0 && refferalTeamListToShow[index - 1].level !== item.level || index === 0 ? 'Level : ' + item.level : ''}</span>
+                                                <tr key={index}>
+                                                    <li>{item.full_name}</li>
+                                                </tr>
+                                            </>
                                         ) : <span>No result found</span> : <Loader />}
                                     </ul>
                                 </PerfectScrollbar>

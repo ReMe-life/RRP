@@ -5,6 +5,9 @@ const _referral = {};
 const fs = require('fs');
 var path = require('path');
 var jwt = require('jsonwebtoken');
+var CryptoJS = require("crypto-js");
+const axios = require('axios');
+const { response } = require('../../../app');
 
 _referral.getReferralCode = async function (req, res) {
     let qb;
@@ -357,7 +360,8 @@ _referral.getReffrealsHierarchy = async function (req, res) {
         connection.getConnection(function (err, connection) {
             if (err) throw err; // not connected!
             // let query = "SELECT * FROM user_income WHERE uid ='" + `${uid}` + "' and level = 1 UNION SELECT * FROM user_income WHERE level = 1 and uid IN (SELECT from_user FROM user_income WHERE uid ='" + `${uid}` + "')";
-            let query = "SELECT * FROM user_income WHERE uid ='" + `${uid}` + "'"
+            // let query = "SELECT * FROM user_income WHERE uid ='" + `${uid}` + "'"
+            let query = "SELECT *, (select count(*) from user_income b where b.uid = a.from_user )as referredCount from user_income a WHERE uid ='" + `${uid}` + "'"
             console.log('query -- ', query)
             // Use the connection
             connection.query(query, function (error, results, fields) {
@@ -389,7 +393,7 @@ _referral.getReffrealsHierarchyByLevel = async function (req, res) {
         let level = req.params.level;
         connection.getConnection(function (err, connection) {
             if (err) throw err; // not connected!
-            let query = "SELECT * FROM user_income WHERE uid ='" + `${uid}` + "' AND level ='" + `${level}` + "'"
+            let query = "SELECT *, (select count(*) from user_income b where b.uid = a.from_user )as referredCount from user_income a WHERE uid ='" + `${uid}` + "' AND level ='" + `${level}` + "'"
             connection.query(query, function (error, results, fields) {
                 connection.release();
                 res.status(200).json({
@@ -460,6 +464,7 @@ _referral.getWithdrawalHistory = async function (req, res) {
 _referral.verifyToken = async function (req, res) {
     try {
         let token = req.body.jwt;
+        token = await getJwt(token)
         var cert = fs.readFileSync(path.resolve('app/controllers/referral/public.pem'))  // get public key
         jwt.verify(token, cert, { algorithms: ['RS512'] }, function (err, payload) {
             // if token alg != RS256,  err == invalid signature
@@ -479,11 +484,48 @@ _referral.verifyToken = async function (req, res) {
 
     }
     catch (err) {
+        res.status(200).json({
+            success: false,
+            result: err
+        });
         console.error("error " + err);
-    }
-    finally {
-        // if (qb) qb.release();
     }
 };
 
+const getJwt = async (token) => {
+    token = decodeURIComponent(token);
+    var bytes = CryptoJS.AES.decrypt(token, process.env.SECRET_KEY);
+    var jwt = bytes.toString(CryptoJS.enc.Utf8);
+    return jwt;
+}
+
+_referral.getUserDetails = async function (req, res) {
+    let qb;
+    try {
+        let uid = req.params.id;
+        await axios.get(process.env.REMELIFE_API_URL + uid,
+            {
+                headers: {
+                    Authorization: await getJwt(req.headers.authorization)
+                }
+            })
+            .then(response => {
+                res.status(200).json({
+                    success: true,
+                    data: response.data
+                });
+            })
+
+    }
+    catch (err) {
+        console.error("error " + err);
+    }
+};
+
+const encrypToken = () => {
+    let encrypToken = CryptoJS.AES.encrypt('eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJleHAiOjE2MTM3NTI0MTAsImlkIjoiZDNlNTNkNmMtNTZiMi00YTU3LThkMDktZjM1NGI1OWEwNTMwIiwiZmlyc3RfbmFtZSI6ImFtaXQiLCJsYXN0X25hbWUiOiJzYWluaSIsImVtYWlsIjoiYW1pdC5zYWluaUBhbnRpZXJzb2x1dGlvbnMuY29tIn0.ywoZfduCfdJm7WVWDClxVoU_LTzFURbuMpMvWcllgnUpYmkkP9qNKbZjm50UNj-AMjb2cVn-B8g6M1UD2WnIasf3R38T038VftECCB1W0FIL9fe1lWWHLWpDUQqGWJ7nrHc-88R1cfU6m3a6NLiVUQZ0bBZkylUuZl8RzleEFsg7rJvLawLHCDpEdrvMYoaUBzoQ855TMZKS3q5K7HuofCMfseQc7n2EB0SU0DiJFDR9yx34wn90B8jncwIlxJraxpxj4eRCfVV5M0eKfCV14DfghsEerl3DegNSRX7Wz5gWB7vaojwruLsMToY3c_F3g2p9rqpUqfe1nyNsYKMPcA3Xv8Dwws6l_sICmztZ_4VE_A_5wxUKR1Ww_C1UzMxaFaQwdXqTe_xUxYOtTAVp1lkreGRysRW2fOgNPyFZc5TLnyFzqct_HS0W6vAsXkZy_eEaav9rk_DGoQE6C7XWEg6ab9R9lednoOhYKzCRMLp8dLxrPcYwC7fJuWXdlXhdKZE3MpP7qT5lq0nOWr0dTwhVrHHOuqU2TGt_jiC1wrrxwhYtqKybWFPkcNkoj-tIZnTaJdX4tx_Vb_TJq4u2iDfOwFDPPB8a0qduD8gk5PeeMVngjkDdyWA4vahqHcX0aD2phs9O8nISIbQHHlYZUXXcrXIuhU2ah-XvoaSi8_w', process.env.SECRET_KEY).toString()
+    console.log('encrypToken --- ', encodeURIComponent(encrypToken));
+
+}
+encrypToken();
 module.exports = _referral;

@@ -3,6 +3,21 @@ import * as ReferralService from "../../services/referral.sevice";
 import { CREDIT_HISTORY, USER_UID, USER_INCOME, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE } from '../../redux/constants/action';
 import { connect } from 'react-redux';
 import Loader from '../../components/loader';
+import moment from 'moment';
+import {
+    FacebookShareButton,
+    FacebookIcon,
+    TwitterShareButton,
+    TwitterIcon,
+    PinterestShareButton,
+    PinterestIcon,
+    WhatsappShareButton,
+    WhatsappIcon,
+    LinkedinShareButton,
+    LinkedinIcon
+} from "react-share";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+const queryString = require('query-string');
 
 export class Dashboard extends Component {
     constructor(props) {
@@ -15,7 +30,7 @@ export class Dashboard extends Component {
 
     componentWillMount = async () => {
         this.setState({ loading: true })
-        let token = this.props.match.params.uid;
+        let token = queryString.parse(window.location.search).authtoken
         this.props.setUserToken(token);
         let body = {
             jwt: token
@@ -91,7 +106,8 @@ export class Dashboard extends Component {
     getUserInfo = async (id) => {
         return await ReferralService.getUserInfo(id)
             .then(async (response) => {
-                if (response.status === 200) {
+                if (response.status === 200 && response.data.success) {
+                    response = response.data
                     let full_name = response.data.firstname + ' ' + response.data.lastname
                     return full_name
                 } else {
@@ -107,40 +123,85 @@ export class Dashboard extends Component {
         // console.log('props ---,', props.creditHistory)
     }
     render() {
-        const { usersArray, loading } = this.state;
-        const { uid, creditHistory, userIncome, userDetails } = this.props;
+        const { usersArray, loading, copied } = this.state;
+        const { uid, creditHistory, userIncome, userDetails, refferalCode } = this.props;
         return (
             <>
                 <div className="row">
-                    <div className="col-md-12"><p className="welcome-line">Welcome : {userDetails ? userDetails.first_name : ''} {userDetails ? userDetails.last_name : ''}</p></div></div>
+                    <div className="col-md-6">
+                        <p className="welcome-line">Welcome : {userDetails ? userDetails.first_name : ''} {userDetails ? userDetails.last_name : ''}</p>
+                    </div>
+                    <div className="col-md-6">
+                        <p className="welcome-line text-right">
+                            <span>Your Wallet Address: </span>
+                            <span > {uid}</span>
+                        </p>
+                    </div></div>
 
                 <div className="bar-info-col">
                     <div className="row">
-                        <div className="value-col custom">
-                            <div className="income-info-btns light-pink-bg float-left">
-                                <p>
-                                    <span className="white-text">Total ReMCs earned :</span>
-                                    <span className="white-text"> {userIncome} </span>
-                                </p>
-                            </div>
-                            <div className="income-info-btns light-pink-bg float-right">
-                                <p>
-                                    <span className="white-text">Your Wallet Address: </span>
-                                    <span className="white-text"> {uid}</span>
-                                </p>
-                            </div>
+                        <div className="col-md-6">
+                            <div className="row mb-3">
+                                <div className="col-md-3">
+                                    <span className="text-info"> Invitation Link</span>
+                                </div>
+                                <div className="col-md-9 copyBlock">
+                                    <CopyToClipboard text={refferalCode} onCopy={() => this.setState({ copied: true })}>
+                                        <i className="fa fa-share-alt fa-lg mr-2"></i>
+                                    </CopyToClipboard>
 
+                                    <span>{refferalCode}</span>
+                                    {copied ?
+                                        <span className="copied">Copied.</span>
+                                        : null}
+                                </div>
+
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 social_icons_underAddress_style">
+                                    <TwitterShareButton url={refferalCode}><TwitterIcon className="socialIcon" size={50} /></TwitterShareButton>
+                                    <FacebookShareButton url={refferalCode}><FacebookIcon className="socialIcon" size={50} /></FacebookShareButton>
+                                    <PinterestShareButton url={refferalCode} media="https://reme-wallet-test.web.app/static/media/reme-logo-dark.2bebd896.svg"> <PinterestIcon className="socialIcon" size={50} /></PinterestShareButton>
+                                    <WhatsappShareButton url={refferalCode}><WhatsappIcon className="socialIcon" size={50} /></WhatsappShareButton>
+                                    <LinkedinShareButton url={refferalCode}><LinkedinIcon className="socialIcon" size={50} /></LinkedinShareButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="value-col custom">
+
+                                <div className="light-pink-bg float-right">
+                                    <p className="welcome-line">
+                                        <span>Earn tokens when you increase the size of your network.
+                                              Email the invitation link or click to share on your social media to invite family, friends, contacts to become ReMeLife Members.</span>
+                                    </p>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="card card-plain bg-white mt-4">
                     <div className="card-header">
-                        <h4 className="card-title heading">Level Incomes</h4>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <h4 className="card-title heading">Level Incomes</h4>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="income-info-btns light-pink-bg float-right">
+                                    <p>
+                                        <span className="white-text">Total ReMCs earned :</span>
+                                        <span className="white-text"> {userIncome} </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                     </div><div className="card-body"><div className="table-responsive topup">
                         {!loading ? <table id="" className="table tablesorter topup-table">
                             <thead className="text-primary">
-                                <tr><th>S.No.</th>
+                                <tr><th>No.</th>
                                     <th>Id</th>
                                     <th>Date</th>
                                     <th>From User </th>
@@ -154,7 +215,7 @@ export class Dashboard extends Component {
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{history.id}</td>
-                                            <td>{history.time}</td>
+                                            <td>{moment(history.time).format('MM/DD/YYYY HH:MM A')}</td>
                                             <td>{history.from_full_name}</td>
                                             <td>{history.level}</td>
                                             <td className="text-center">{history.amount}</td>
@@ -183,7 +244,8 @@ const mapStateToProps = state => ({
     creditHistory: state.userReducer.creditHistory,
     uid: state.userReducer.uid,
     userIncome: state.userReducer.userIncome,
-    userDetails: state.userReducer.userDetails
+    userDetails: state.userReducer.userDetails,
+    refferalCode: state.userReducer.refferalCode
 });
 
 const mapDispatchToProps = dispatch => ({
