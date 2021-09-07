@@ -48,14 +48,16 @@ export class Team extends Component {
                 if (response.success) {
                     await this.props.setUserDetails(response.result);
                     await this.props.setUid(response.result.id);
+
+                    console.log('response.result -- ', response.result)
                     this.setState({
                         tree: [{
                             "name": response.result.id,
                             'full_name': this.props.userDetails ? this.props.userDetails.first_name + ' ' + this.props.userDetails.last_name : ""
                         }],
                     }, () => {
-                        this.getReffrealsHierarchy(response.result.id);
-                        this.getLevelUsers(response.result.id);
+                        this.getReffrealsHierarchy(response.result.wallet);
+                        this.getLevelUsers(response.result.wallet);
                     })
                 } else {
                     alert('invalid or expired token!!')
@@ -205,19 +207,19 @@ export class Team extends Component {
     createRefferalTeamList = async (index) => {
         const { refferalTeamList } = this.state;
         if (refferalTeamList.length > index) {
-            if (refferalTeamList[index].level === 1) {
-                await this.getUserInfo(refferalTeamList[index].from_user)
-                    .then((full_name) => {
-                        refferalTeamList[index].full_name = full_name + '(' + refferalTeamList[index].referredCount + ' referred)'
-                        this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
-                        this.createRefferalTeamList(index + 1)
-                    })
-                    .catch((err) => {
-                        // showNotification("danger", ERRORMSG);
-                    });
-            } else {
-                refferalTeamList[index].full_name = 'User-' + refferalTeamList[index].from_user.split('-')[4] + '(' + refferalTeamList[index].referredCount + ' referred)'
+            if (refferalTeamList[index].level > 0) {
+                // await this.getUserInfo(refferalTeamList[index].from_user)
+                //     .then((full_name) => {
+                refferalTeamList[index].full_name = refferalTeamList[index].from_user.slice(0, 4) + '...' + refferalTeamList[index].from_user.substr(refferalTeamList[index].from_user.length - 15) + '(' + refferalTeamList[index].referredCount + ' referred)'
                 this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
+                this.createRefferalTeamList(index + 1)
+                // })
+                // .catch((err) => {
+                //     // showNotification("danger", ERRORMSG);
+                // });
+            } else {
+                // refferalTeamList[index].full_name = 'User-' + refferalTeamList[index].from_user + '(' + refferalTeamList[index].referredCount + ' referred)'
+                // this.setState({ refferalTeamList: refferalTeamList, refferalTeamListToShow: refferalTeamList })
                 this.createRefferalTeamList(index + 1)
             }
 
@@ -307,12 +309,12 @@ export class Team extends Component {
                                 <PerfectScrollbar>
                                     <ul className="userList p-1">
                                         {loaded ? refferalTeamListToShow.length ? refferalTeamListToShow.map((item, index) =>
-                                            <>
+                                            item.level > 0 ? <>
                                                 <span className="levelSpan"> {index !== 0 && refferalTeamListToShow[index - 1].level !== item.level || index === 0 ? 'Level : ' + item.level : ''}</span>
                                                 <tr key={index}>
                                                     <li>{item.full_name}</li>
                                                 </tr>
-                                            </>
+                                            </> : ''
                                         ) : <span>No result found</span> : <Loader />}
                                     </ul>
                                 </PerfectScrollbar>

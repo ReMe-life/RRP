@@ -53,12 +53,12 @@ export class Dashboard extends Component {
                 response = response.data;
                 if (response.success) {
                     let self = this;
-                    self.setState({ usersArray: [] });
-                    await response.data.forEach(async function (item, index) {
-                        item.from_full_name = await self.getUserInfo(item.from_user);
-                        self.state.usersArray.push(item);
-                        self.setState({ usersArray: self.state.usersArray, loading: false });
-                    });
+                    self.setState({ usersArray: response.data, loading: false });
+                    // await response.data.forEach(async function (item, index) {
+                    //     item.from_full_name = await self.getUserInfo(item.from_user);
+                    //     self.state.usersArray.push(item);
+                    //     self.setState({ usersArray: self.state.usersArray, loading: false });
+                    // });
                 } else {
                     this.setState({ loading: false })
                 }
@@ -134,29 +134,13 @@ export class Dashboard extends Component {
                     <div className="col-md-6">
                         <p className="welcome-line text-right">
                             <span>Your Wallet Address: </span>
-                            <span > {uid}</span>
+                            <span > {userDetails ? userDetails.wallet : '---'}</span>
                         </p>
                     </div></div>
 
                 <div className="bar-info-col">
                     <div className="row">
                         <div className="col-md-6">
-                            <div className="row mb-3">
-                                <div className="col-md-3">
-                                    <span className="text-info"> Invitation Link</span>
-                                </div>
-                                <div className="col-md-9 copyBlock">
-                                    <CopyToClipboard text={refferalCode} onCopy={() => this.setState({ copied: true })}>
-                                        <i className="fa fa-share-alt fa-lg mr-2"></i>
-                                    </CopyToClipboard>
-
-                                    <span>{refferalCode}</span>
-                                    {copied ?
-                                        <span className="copied">Copied.</span>
-                                        : null}
-                                </div>
-
-                            </div>
                             <div className="row">
                                 <div className="col-md-12 social_icons_underAddress_style">
                                     <TwitterShareButton url={refferalCode}><TwitterIcon className="socialIcon" size={50} /></TwitterShareButton>
@@ -172,7 +156,7 @@ export class Dashboard extends Component {
 
                                 <div className="light-pink-bg float-right">
                                     <p className="welcome-line">
-                                        <span>Earn tokens when you increase the size of your network.
+                                        <span>Earn CAPS when you increase the size of your network.
                                               Email the invitation link or click to share on your social media to invite family, friends, contacts to become ReMeLife Members.</span>
                                     </p>
                                 </div>
@@ -191,7 +175,7 @@ export class Dashboard extends Component {
                             <div className="col-md-6">
                                 <div className="income-info-btns light-pink-bg float-right">
                                     <p>
-                                        <span className="white-text">Total ReMCs earned :</span>
+                                        <span className="white-text">Total CAPS earned :</span>
                                         <span className="white-text"> {userIncome} </span>
                                     </p>
                                 </div>
@@ -206,7 +190,7 @@ export class Dashboard extends Component {
                                     <th>Date</th>
                                     <th>From User </th>
                                     <th>Level</th>
-                                    <th className="text-center">Amount(ReMC)</th>
+                                    <th className="text-center">Amount(CAPS)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -216,7 +200,7 @@ export class Dashboard extends Component {
                                             <td>{index + 1}</td>
                                             <td>{history.id}</td>
                                             <td>{moment(history.time).format('MM/DD/YYYY HH:MM A')}</td>
-                                            <td>{history.from_full_name}</td>
+                                            <td>{history.uid}{history.level == 0 ? ' (You)' : ''}</td>
                                             <td>{history.level}</td>
                                             <td className="text-center">{history.amount}</td>
                                         </tr>

@@ -466,7 +466,7 @@ _referral.verifyToken = async function (req, res) {
         let token = req.body.jwt;
         token = await getJwt(token)
         var cert = fs.readFileSync(path.resolve('app/controllers/referral/public.pem'))  // get public key
-        jwt.verify(token, cert, { algorithms: ['RS512'] }, function (err, payload) {
+        jwt.verify(token.token, cert, { algorithms: ['RS512'] }, function (err, payload) {
             // if token alg != RS256,  err == invalid signature
             if (err) {
                 res.status(200).json({
@@ -477,7 +477,7 @@ _referral.verifyToken = async function (req, res) {
             else {
                 res.status(200).json({
                     success: true,
-                    result: payload
+                    result: { ...payload, wallet: token.wallet },
                 });
             }
         });
@@ -495,10 +495,16 @@ _referral.verifyToken = async function (req, res) {
 const getJwt = async (token) => {
     token = decodeURIComponent(token);
     var bytes = CryptoJS.AES.decrypt(token, process.env.SECRET_KEY);
-    var jwt = bytes.toString(CryptoJS.enc.Utf8);
-    return jwt;
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData
 }
 
+const getJwtToken = async (token) => {
+    token = decodeURIComponent(token);
+    var bytes = CryptoJS.AES.decrypt(token, process.env.SECRET_KEY);
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData.token
+}
 _referral.getUserDetails = async function (req, res) {
     let qb;
     try {
@@ -506,7 +512,7 @@ _referral.getUserDetails = async function (req, res) {
         await axios.get(process.env.REMELIFE_API_URL + uid,
             {
                 headers: {
-                    Authorization: await getJwt(req.headers.authorization)
+                    Authorization: await getJwtToken(req.headers.authorization)
                 }
             })
             .then(response => {
@@ -523,8 +529,18 @@ _referral.getUserDetails = async function (req, res) {
 };
 
 const encrypToken = () => {
-    let encrypToken = CryptoJS.AES.encrypt('eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJleHAiOjE2MTM3NTI0MTAsImlkIjoiZDNlNTNkNmMtNTZiMi00YTU3LThkMDktZjM1NGI1OWEwNTMwIiwiZmlyc3RfbmFtZSI6ImFtaXQiLCJsYXN0X25hbWUiOiJzYWluaSIsImVtYWlsIjoiYW1pdC5zYWluaUBhbnRpZXJzb2x1dGlvbnMuY29tIn0.ywoZfduCfdJm7WVWDClxVoU_LTzFURbuMpMvWcllgnUpYmkkP9qNKbZjm50UNj-AMjb2cVn-B8g6M1UD2WnIasf3R38T038VftECCB1W0FIL9fe1lWWHLWpDUQqGWJ7nrHc-88R1cfU6m3a6NLiVUQZ0bBZkylUuZl8RzleEFsg7rJvLawLHCDpEdrvMYoaUBzoQ855TMZKS3q5K7HuofCMfseQc7n2EB0SU0DiJFDR9yx34wn90B8jncwIlxJraxpxj4eRCfVV5M0eKfCV14DfghsEerl3DegNSRX7Wz5gWB7vaojwruLsMToY3c_F3g2p9rqpUqfe1nyNsYKMPcA3Xv8Dwws6l_sICmztZ_4VE_A_5wxUKR1Ww_C1UzMxaFaQwdXqTe_xUxYOtTAVp1lkreGRysRW2fOgNPyFZc5TLnyFzqct_HS0W6vAsXkZy_eEaav9rk_DGoQE6C7XWEg6ab9R9lednoOhYKzCRMLp8dLxrPcYwC7fJuWXdlXhdKZE3MpP7qT5lq0nOWr0dTwhVrHHOuqU2TGt_jiC1wrrxwhYtqKybWFPkcNkoj-tIZnTaJdX4tx_Vb_TJq4u2iDfOwFDPPB8a0qduD8gk5PeeMVngjkDdyWA4vahqHcX0aD2phs9O8nISIbQHHlYZUXXcrXIuhU2ah-XvoaSi8_w', process.env.SECRET_KEY).toString()
-    console.log('encrypToken --- ', encodeURIComponent(encrypToken));
+
+    let data = {
+        wallet: '0x5B30aC89c67CfC04AFbFee83B1be216D0A6F47f8',
+        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJleHAiOjE2MjA5MjM3MjIsImlkIjoiZDNlNTNkNmMtNTZiMi00YTU3LThkMDktZjM1NGI1OWEwNTMwIiwiZmlyc3RfbmFtZSI6ImFtaXQiLCJsYXN0X25hbWUiOiJzYWluaSIsImVtYWlsIjoiYW1pdC5zYWluaUBhbnRpZXJzb2x1dGlvbnMuY29tIn0.Bcj7txxw9b6ytxYPBW7dScZW8veoCyiJciLglFcPACQgt6nl5GklLH6hlb3GM6nu3yAioJie-u7AysmreEJyTOsS-jSzy80U4EecMMX9X_yBf-roHTJ7ysuDAm2ngzk0UFlfqQkPnzVA94QJxYZYW9PtTdy3uYVmPyLf6cPGcYZgvBo71QOv-2EU5CSVbxkcuIA3jlkePF3_-Q1Q-vtzIolsi7xYCmeZz_l704FXcmItx7Gt8ICC3oNeGY9x0iouVXf42MphOg1XpuKwp-P0Q4J0I0GypC5lfO4i3fXZ5RTRWJbXpzC7FXwcL0WNPlp9mlRfCh56-yZPBI8INbGixk2zHHnihK-e_2bW5-Q4gM-mwSrlnH17IeADLdjX6vPifRLTCpszlfnlHNoJ_4Q_N22FZNgbCj0t6dw1BQP5yHoriWEEZe2Ag_17HuLUzWDEJ_hJemVOpWQNn37lu1xfq0PtE6ShozmY57JLvnP6EvQWoi8bYmX9HysBj6g0osyTu-vimidM2p56ygY3qK8rUj7myJ08XkItfRdL01YtYfG9ttAeqm9fm-r-RBOyQAf_-O9zBQEJ07PAN7K9D0r_j-rCPm2QCqThEEvUMmSHPyR3MeYfIURJhQTlwEDfwLXa8V9czCBVgiJAnaScuIc8_aFgeeQYFVlq_AKlrx8KOS0'
+    }
+    let encrypToken = CryptoJS.AES.encrypt(JSON.stringify(data), process.env.SECRET_KEY).toString()
+
+    encrypToken = encodeURIComponent(encrypToken)
+    console.log('encrypToken --- ', encrypToken);
+
+    // let encrypToken = CryptoJS.AES.encrypt('eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJleHAiOjE2MTk2NTI5MDcsImlkIjoiZDNlNTNkNmMtNTZiMi00YTU3LThkMDktZjM1NGI1OWEwNTMwIiwiZmlyc3RfbmFtZSI6ImFtaXQiLCJsYXN0X25hbWUiOiJzYWluaSIsImVtYWlsIjoiYW1pdC5zYWluaUBhbnRpZXJzb2x1dGlvbnMuY29tIn0.LCc-X19ZcA8VdH9r9jaH4lH8Dnv5TjI3XzweueGWu15LYse-oDJlyCVkWBJ_twfaVQicnXlnVd0HwA9-ronWm2wQxu6nKwTF2ujrfnbu4QBlIo383XzlAT_ldtP9n7SHktyazBjqvfMWxu-M6bVnQZltnhzIRCOHaxcvfR8JysnIimjARrA5EGpHtcMasQQlUbikjpJed2-6De6X7x26-RNiriV3393UlLkkA1ig4kX8Oi3MpN0C06esrTnHzGP2xEjOD5AMr7f1Mmv1-lZ-u8H10F5m09CVWqM1-hfZ0fFxQ078k2IBstXqwd1toBrDlC0c_IOIjnL1FpXF76Hwno4TzxsPgnIRh3V5vnQj8ghRVfMKJH788JN3OtP8ac3337zMRuKfW16aBgqS6KTL4MQopjECed3bT314HZSj4w7xfczQc-22NrxHbPbqfhH864qIIb15Tr2DXlJnxbhR2R1fO-ZmV6hsR0_CZGEkoUdN-bhQdG7PVaR8_HaFcnEAKCWHH4EbKZou3GileMKbH1epXNeXjrPIvl3HVyotnQIhuCVbwmxxb1uh2yc9ARz3IO1mvDxFe_i4mqBVf3N2ZP9D4r8cSqX2C5s-OSu8YBmZTqQV9j80WrrRMCISHDvHTSUX8ublTDsyrNzqB1AsnHAMbZ9mWAxN9GN1sJedx24', process.env.SECRET_KEY).toString()
+    // console.log('encrypToken --- ', encodeURIComponent(encrypToken));
 
 }
 encrypToken();

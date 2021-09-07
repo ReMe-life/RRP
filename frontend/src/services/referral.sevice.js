@@ -7,7 +7,10 @@ const getUID = () => {
     var storeData = store.getState();
     return storeData.userReducer.uid;
 }
-
+const getWlletAddress = () => {
+    var storeData = store.getState();
+    return storeData.userReducer.userDetails.wallet;
+}
 const getJWT = () => {
     var storeData = store.getState();
     return storeData.userReducer.userToken;
@@ -15,7 +18,7 @@ const getJWT = () => {
 
 export const getMyBalance = async () => {
     return await api
-        .getReq(routes.getMyBalance + '/' + getUID())
+        .getReq(routes.getMyBalance + '/' + getWlletAddress())
         .then((response) => {
             return response;
         })
@@ -24,7 +27,7 @@ export const getMyBalance = async () => {
 
 export const getReferralCode = async () => {
     return await api
-        .getReq(routes.getReferralCode + '/' + getUID())
+        .getReq(routes.getReferralCode + '/' + getWlletAddress())
         .then((response) => {
             return response;
         })
@@ -33,7 +36,7 @@ export const getReferralCode = async () => {
 
 export const getCreditHistory = async (uid) => {
     return await api
-        .getReq(routes.getCreditHistory + '/' + getUID())
+        .getReq(routes.getCreditHistory + '/' + getWlletAddress())
         .then((response) => {
             return response;
         })
@@ -42,7 +45,7 @@ export const getCreditHistory = async (uid) => {
 
 export const getTotalIncome = async (uid) => {
     return await api
-        .getReq(routes.getTotalIncome + '/' + getUID())
+        .getReq(routes.getTotalIncome + '/' + getWlletAddress())
         .then((response) => {
             return response;
         })
