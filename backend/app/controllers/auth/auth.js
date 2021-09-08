@@ -12,7 +12,7 @@ _auth.authenticate = async (req, res, next) => {
             console.log(err.message)
             res.status(401).json({
                 success: false,
-                message: "Invalid token",
+                message: "Invalid token"
             });
         }
         else {
