@@ -463,9 +463,10 @@ _referral.getWithdrawalHistory = async function (req, res) {
 
 _referral.verifyToken = async function (req, res) {
     try {
+        console.log("Hello I am from referal")
         let token = req.body.jwt;
         token = await getJwt(token)
-        var cert = fs.readFileSync(path.resolve('app/controllers/referral/public.pem'))  // get public key
+        var cert = fs.readFileSync(path.resolve('app/controllers/referral/publicv2.pem'))  // get public key
         jwt.verify(token.token, cert, { algorithms: ['RS512'] }, function (err, payload) {
             // if token alg != RS256,  err == invalid signature
             if (err) {
