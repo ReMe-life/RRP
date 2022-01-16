@@ -72,6 +72,7 @@ _referral.getUserReferralCode = async function (req, res) {
 };
 
 _referral.addWithReferral = async function (req, res) {
+    console.log('Callback from remewallet api to rrp addwithreferral')
     let qb;
     try {
         let uid = req.body.uid;
@@ -115,20 +116,26 @@ function getAmountByPer(num, per) {
 async function manageUserIncome(user) {
     let qb;
     try {
+        console.log('referral in userincome =>', user.uid)
         let uid = user.uid;
         qb = await pool.get_connection();
         const distributions = await qb.select('*').get('distribution_settings');
+        console.log('referral in userincome =>', distributions)
         let distributionsData = distributions[0];
         let main_amount = distributionsData.main_amount;
         let level_1_amount = getAmountByPer(main_amount, distributionsData.level_1_per);
         let level_2_amount = getAmountByPer(main_amount, distributionsData.level_2_per);
         let level_3_amount = getAmountByPer(main_amount, distributionsData.level_3_per);
         await qb.insert('user_income', { uid: uid, amount: distributions[0].main_amount, new: true });
+        console.log('userincome insertion with uid')
         let l1 = await qb.select('referred_by').where({ uid: uid }).get('referred_user');
+        console.log('userincome insertion with uid', l1)
         if (l1.length > 0) {
             let l1_uid = await qb.select('uid').where({ referral_code: l1[0].referred_by }).get('user_referral_code');
+            console.log('refererd_by l1', l1_uid)
             await qb.insert('user_income', { uid: l1_uid[0].uid, amount: level_1_amount, level: 1, from_user: uid });
             let l2 = await qb.select('referred_by').where({ uid: l1_uid[0].uid }).get('referred_user');
+            console.log('refererd_by l2', l2)
             if (l2.length > 0) {
                 let l2_uid = await qb.select('uid').where({ referral_code: l2[0].referred_by }).get('user_referral_code');
                 await qb.insert('user_income', { uid: l2_uid[0].uid, amount: level_2_amount, level: 2, from_user: uid });
@@ -200,13 +207,14 @@ async function calculateBalance(uid) {
 }
 
 _referral.getMyBalance = async function (req, res) {
+    console.log('get balance from rrp-latest')
     try {
-        let uid = req.params.id;
-        let currunt_balance = await calculateBalance(uid);
+        //let uid = req.params.id;
+        //let currunt_balance = await calculateBalance(uid);
         res.status(200).json({
             success: true,
             data: {
-                balance: currunt_balance
+                balance: 100
             }
         });
     }
