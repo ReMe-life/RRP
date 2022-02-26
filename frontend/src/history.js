@@ -13,5 +13,6 @@ import { createBrowserHistory } from "history";
 // } else {
 //   basename = base.platform;
 // }
-const history = createBrowserHistory({ basename: '/remelife' });
+//const history = createBrowserHistory({ basename: '/remelife' });
+const history = createBrowserHistory({ basename: '/' });
 export default history;

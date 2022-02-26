@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import * as ReferralService from "../../services/referral.sevice";
-import { CREDIT_HISTORY, USER_UID, USER_INCOME, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE } from '../../redux/constants/action';
+import { CREDIT_HISTORY, USER_UID, USER_INCOME, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE, USER_FULL_NAME } from '../../redux/constants/action';
 import { connect } from 'react-redux';
 import Loader from '../../components/loader';
 import moment from 'moment';
@@ -48,6 +48,23 @@ export class Dashboard extends Component {
             .catch((err) => {
                 // showNotification("danger", ERRORMSG);
             });
+
+        await ReferralService.getUserInfo(this.props.uid)
+            .then((response) => {
+                response = response.data;
+                if (response.success) {
+                    let fullname = response.data ? (response.data.firstname + ' ' + response.data.lastname) : " "
+                    this.props.setFullname(fullname)
+                } else {
+                    alert('invalid or expired token!!')
+                }
+            })
+            .catch((err) => {
+                // showNotification("danger", ERRORMSG);
+            });
+
+
+
         await ReferralService.getCreditHistory()
             .then(async (response) => {
                 response = response.data;
@@ -80,16 +97,20 @@ export class Dashboard extends Component {
 
         await ReferralService.getReferralCode()
             .then((response) => {
+                console.log(response)
                 response = response.data;
                 if (response.success) {
-                    let referral_link = 'https://reme-wallet-test.web.app/registration/' + response.data.referral_code
+                    console.log("in re")
+                    let referral_link = 'https://wallet.remelife.com/registration/' + response.data.referral_code
                     this.props.setRerralCode(referral_link);
                 } else {
-                    alert('Sorry user not found!!')
+                    alert('Sorry user not found wooo!!')
                 }
             })
             .catch((err) => {
-                alert('Sorry user not found!!')
+
+                console.log(err.toString())
+                alert('Sorry user not found!! woo2')
             })
         await ReferralService.getMyBalance()
             .then((response) => {
@@ -124,12 +145,12 @@ export class Dashboard extends Component {
     }
     render() {
         const { usersArray, loading, copied } = this.state;
-        const { uid, creditHistory, userIncome, userDetails, refferalCode } = this.props;
+        const { uid, creditHistory, userIncome, userDetails, refferalCode, userfullName } = this.props;
         return (
             <>
                 <div className="row">
                     <div className="col-md-6">
-                        <p className="welcome-line">Welcome : {userDetails ? userDetails.first_name : ''} {userDetails ? userDetails.last_name : ''}</p>
+                        <p className="welcome-line">Welcome : {userfullName}</p>
                     </div>
                     <div className="col-md-6">
                         <p className="welcome-line text-right">
@@ -145,7 +166,7 @@ export class Dashboard extends Component {
                                 <div className="col-md-12 social_icons_underAddress_style">
                                     <TwitterShareButton url={refferalCode}><TwitterIcon className="socialIcon" size={50} /></TwitterShareButton>
                                     <FacebookShareButton url={refferalCode}><FacebookIcon className="socialIcon" size={50} /></FacebookShareButton>
-                                    <PinterestShareButton url={refferalCode} media="https://reme-wallet-test.web.app/static/media/reme-logo-dark.2bebd896.svg"> <PinterestIcon className="socialIcon" size={50} /></PinterestShareButton>
+                                    <PinterestShareButton url={refferalCode} media="https://wallet.remelife.com/static/media/reme-logo-dark.2bebd896.svg"> <PinterestIcon className="socialIcon" size={50} /></PinterestShareButton>
                                     <WhatsappShareButton url={refferalCode}><WhatsappIcon className="socialIcon" size={50} /></WhatsappShareButton>
                                     <LinkedinShareButton url={refferalCode}><LinkedinIcon className="socialIcon" size={50} /></LinkedinShareButton>
                                 </div>
@@ -158,6 +179,9 @@ export class Dashboard extends Component {
                                     <p className="welcome-line">
                                         <span>Earn CAPS when you increase the size of your network.
                                               Email the invitation link or click to share on your social media to invite family, friends, contacts to become ReMeLife Members.</span>
+                                    </p>
+                                    <p>
+                                        To view an email you can copy and paste to send to contact, please <a onClick={'#'}>Click here</a>.
                                     </p>
                                 </div>
 
@@ -229,7 +253,8 @@ const mapStateToProps = state => ({
     uid: state.userReducer.uid,
     userIncome: state.userReducer.userIncome,
     userDetails: state.userReducer.userDetails,
-    refferalCode: state.userReducer.refferalCode
+    refferalCode: state.userReducer.refferalCode,
+    userfullName: state.userReducer.userfullName
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -240,6 +265,7 @@ const mapDispatchToProps = dispatch => ({
     setRerralCode: payload => dispatch({ type: REFERRAL_CODE, payload: payload }),
     setUserToken: payload => dispatch({ type: USER_TOKEN, payload: payload }),
     setUserBalance: payload => dispatch({ type: USER_BALANCE, payload: payload }),
+    setFullname: payload => dispatch({ type: USER_FULL_NAME, payload: payload }),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

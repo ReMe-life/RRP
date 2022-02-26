@@ -6,7 +6,7 @@ import Dashboard from '../dashboard';
 import history from "../../history";
 import Team from '../Team';
 import * as ReferralService from "../../services/referral.sevice";
-import { USER_BALANCE, USER_UID } from '../../redux/constants/action';
+import {USER_BALANCE, USER_FULL_NAME, USER_UID} from '../../redux/constants/action';
 import { connect } from 'react-redux';
 const queryString = require('query-string');
 
@@ -15,12 +15,29 @@ class Home extends React.Component {
     componentDidMount = async () => {
     }
 
+    componentWillMount = async () => {
+        await ReferralService.getUserInfo(this.props.uid)
+            .then((response) => {
+                response = response.data;
+                if (response.success) {
+                    let fullname = response.data ? (response.data.firstname + ' ' + response.data.lastname) : " "
+                    this.props.setFullname(fullname)
+                } else {
+                    alert('invalid or expired token!!')
+                }
+            })
+            .catch((err) => {
+                // showNotification("danger", ERRORMSG);
+            });
+    }
+
+
     getUserBalance = (totalBalance) => {
         this.props.userDetails(totalBalance);
     }
 
     render() {
-        const { totalBalance, userData } = this.props;
+        const { totalBalance, userData, userfullName } = this.props;
         return (
             <>
                 <div className="container-fluid top-header">
@@ -36,10 +53,10 @@ class Home extends React.Component {
                             <ul className="navbar-nav navbar-nav-ul">
                                 <li className="nav-item active">
                                     {/* <label className="nav-link" href="#"> Total Balance:  {totalBalance} </label> */}
-                                    <label className="nav-link name" href="#">Welcome : {userData ? userData.first_name : ''} {userData ? userData.last_name : ''} </label>
+                                    <label className="nav-link name" href="#">Welcome : {userfullName} </label>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#"> Logout <i class="fas fa-sign-out-alt"></i> </a>
+                                    <a className="nav-link" href="https://wallet.remelife.com/"> Logout <i class="fas fa-sign-out-alt"></i> </a>
                                 </li>
                             </ul>
                         </div>
@@ -61,12 +78,14 @@ class Home extends React.Component {
 
 const mapStateToProps = state => ({
     totalBalance: state.userReducer.totalBalance,
-    userData: state.userReducer.userDetails
+    userData: state.userReducer.userDetails,
+    userfullName: state.userReducer.userfullName
 });
 
 const mapDispatchToProps = dispatch => ({
     userDetails: totalBalance => dispatch({ type: USER_BALANCE, payload: totalBalance }),
     setUid: uid => dispatch({ type: USER_UID, payload: uid }),
+    setFullname: payload => dispatch({ type: USER_FULL_NAME, payload: payload })
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -6,7 +6,7 @@ import {
     USER_INCOME,
     USER_DETAILS,
     REFERRAL_CODE,
-    USER_TOKEN
+    USER_TOKEN, USER_FULL_NAME
 } from '../../redux/constants/action';
 
 export default function userDetails(state = {}, action) {
@@ -50,6 +50,11 @@ export default function userDetails(state = {}, action) {
             return {
                 ...state,
                 userToken: action.payload
+            }
+        case USER_FULL_NAME:
+            return {
+                ...state,
+                userfullName: action.payload
             }
         default:
             return state

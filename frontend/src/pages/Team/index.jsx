@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './style.css'
 import InfiniteTree from 'react-infinite-tree';
 import { connect } from 'react-redux';
-import { REFERRAL_TEAM, USER_UID, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE } from '../../redux/constants/action';
+import { REFERRAL_TEAM, USER_UID, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE, USER_FULL_NAME } from '../../redux/constants/action';
 import * as ReferralService from "../../services/referral.sevice";
 import Tree from 'react-tree-graph';
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -45,9 +45,14 @@ export class Team extends Component {
         await ReferralService.verifyToken(body)
             .then(async (response) => {
                 response = response.data;
+                console.log("verifiytoken")
                 if (response.success) {
+                    console.log("verifiytoken -- success")
+                    console.log(response.result)
                     await this.props.setUserDetails(response.result);
+                    console.log("verifiytoken -- success -> setuserdetails")
                     await this.props.setUid(response.result.id);
+                    console.log("verifiytoken -- success -> setuserid")
 
                     console.log('response.result -- ', response.result)
                     this.setState({
@@ -60,6 +65,22 @@ export class Team extends Component {
                         this.getLevelUsers(response.result.wallet);
                     })
                 } else {
+                    console.log("verifiytoken -- else ...")
+                    alert('invalid or expired token!!')
+                }
+            })
+            .catch((err) => {
+                // showNotification("danger", ERRORMSG);
+                console.log('error in team/index', err)
+            });
+
+        await ReferralService.getUserInfo(this.props.uid)
+            .then((response) => {
+                response = response.data;
+                if (response.success) {
+                    let fullname = response.data ? (response.data.firstname + ' ' + response.data.lastname) : " "
+                    this.props.setFullname(fullname)
+                } else {
                     alert('invalid or expired token!!')
                 }
             })
@@ -69,6 +90,7 @@ export class Team extends Component {
     }
 
     getReffrealsHierarchyByLevel = async (level) => {
+        console.log("getReffrealsHierarchyByLevel -- team/index")
         const { uid } = this.state;
         this.setState({
             loaded: false,
@@ -76,6 +98,7 @@ export class Team extends Component {
         })
         await ReferralService.getReffrealsHierarchyByLevel(uid, level)
             .then(async (response) => {
+                console.log("getReffrealsHierarchyByLevel -- uid level", response)
                 response = response.data;
                 if (response.success) {
                     this.setState({
@@ -132,6 +155,7 @@ export class Team extends Component {
                     // this.setState({
                     //     loaded: true
                     // })
+                    console.log("verifiytoken -- success in referalhisotry")
                 }
 
             })
@@ -142,7 +166,7 @@ export class Team extends Component {
             .then((response) => {
                 response = response.data;
                 if (response.success) {
-                    let referral_link = 'https://reme-wallet-test.web.app/registration/' + response.data.referral_code
+                    let referral_link = 'https://wallet.remelife.com/registration/' + response.data.referral_code
                     this.props.setRerralCode(referral_link);
                 } else {
                     alert('Sorry user not found!!')
@@ -288,15 +312,21 @@ export class Team extends Component {
         })
     }
 
+    Capitalize(str){
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     render() {
-        const { uid, refferalTeam, } = this.props;
+        const { uid, refferalTeam, userfullName } = this.props;
         const { tree, loaded, binaryTree, level_1, level_2, level_3, refferalTeamListToShow, activeLevel } = this.state;
         return (
             <div className="paddingGraph refUserTree">
 
                 <div className="row">
                     <div className="col-md-3 text-left treeDiv">
-                        <h5>Your Network</h5>
+                        <h5>{userfullName} Network</h5>
+                        <h5>Total Number of Members in your ReMeLife Network</h5>
+                        <h5 className='text-primary-bg'>{ refferalTeamListToShow.length ? refferalTeamListToShow.length : 0 }</h5>
                         <div className="referedUser">
                             <div className="headSec">
                                 <h2>Referred Users</h2>
@@ -452,7 +482,8 @@ export class Team extends Component {
 const mapStateToProps = state => ({
     uid: state.userReducer.uid,
     refferalTeam: state.userReducer.refferalTeam,
-    userDetails: state.userReducer.userDetails
+    userDetails: state.userReducer.userDetails,
+    userfullName: state.userReducer.userfullName
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -462,6 +493,7 @@ const mapDispatchToProps = dispatch => ({
     setRerralCode: payload => dispatch({ type: REFERRAL_CODE, payload: payload }),
     setUserToken: payload => dispatch({ type: USER_TOKEN, payload: payload }),
     setUserBalance: payload => dispatch({ type: USER_BALANCE, payload: payload }),
+    setFullname: payload => dispatch({ type: USER_FULL_NAME, payload: payload })
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Team);

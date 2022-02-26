@@ -7,3 +7,4 @@ export const REFERRAL_TEAM = "REFERRAL_TEAM";
 export const USER_INCOME = "USER_INCOME";
 export const REFERRAL_CODE = "REFERRAL_CODE";
 export const USER_TOKEN = "USER_TOKEN";
+export const USER_FULL_NAME = "USER_FULL_NAME";

@@ -46,7 +46,7 @@ export class Sidebar extends Component {
 
                     <div className="container affliateLinkGroup">
                         <div className="row">
-                            <a href="https://reme-wallet-test.web.app/" target="_blank" className="col-md-12 inner-group c-p">
+                            <a href="https://wallet.remelife.com/" target="_blank" className="col-md-12 inner-group c-p">
                                 <h4 >View Wallet</h4>
                             </a></div></div>
                     <div className="container affliateLinkGroup">
