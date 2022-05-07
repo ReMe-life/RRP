@@ -1,6 +1,14 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
-import logo from '../../assets/img/logo_re.png'
+import logo from '../../assets/images/reme-logo.svg'
+import navIcon from '../../assets/images/nav-icon.png'
+import dashboardIcon from '../../assets/images/dashboard-icon.png'
+import networkIcon from '../../assets/images/network-icon.png'
+import viewIcon from '../../assets/images/view-icon.png'
+import copyIcon from '../../assets/images/copy.svg'
+import viewIconPink from '../../assets/images/view-icon-pink.png'
+import topHeaderBg from '../../assets/img/top-header-bg.png'
+import ApplicationBackground from '../../assets/images/background.6e81d4b2.jpg'
 import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
 import Dashboard from '../dashboard';
 import history from "../../history";
@@ -13,6 +21,15 @@ const queryString = require('query-string');
 
 class Home extends React.Component {
     componentDidMount = async () => {
+    }
+
+    sayHi() {
+        var x = document.getElementById("left-menu");
+        if (x.style.display === "block") {
+            x.style.display = "none";
+        } else {
+            x.style.display = "block";
+        }
     }
 
     componentWillMount = async () => {
@@ -40,36 +57,38 @@ class Home extends React.Component {
         const { totalBalance, userData, userfullName } = this.props;
         return (
             <>
-                <div className="container-fluid top-header">
-                    <nav className="navbar navbar-expand-lg navbar-light ">
-                        <a className="navbar-brand logo" href="#"><img src={logo} /></a>
-                        <div className="siteTitle_style">
-                            <span className="heading">ReMe Referral Program</span>
+                <div className="application" style={{backgroundImage: `url(${ApplicationBackground})`}}>
+                    <section className="wrapper homepage authtoken">
+                    <div className="common-wrapper">
+                        <div className="top-header" style={{backgroundImage: `url(${topHeaderBg})`}}>
+                            <div className="title">
+                                <h1><a href="https://remelife.com"><img src={logo} alt="ReMe Wallet" /></a></h1>
+                            </div>
+                            <div className="nav-icon-box">
+                                <a href="https://wallet.remelife.com/" className="btn secondary green" >Logout</a>
+                                <img onClick={this.sayHi} className="nav-icon" src={navIcon}/>
+                                <div className="top-menu" id="main-menu">
+                                    <ul>
+                                        <li><a href="https://remelife.com/token-wallet-explanation/">Need help?</a></li>
+                                        <li><a href="https://remelife.com/">ReMeLife</a></li>
+                                        <li><a href="https://remelife.com/terms-and-conditions/">Terms & Conditions</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                        <div className="collapse navbar-collapse" id="navbarNav">
-                            <ul className="navbar-nav navbar-nav-ul">
-                                <li className="nav-item active">
-                                    {/* <label className="nav-link" href="#"> Total Balance:  {totalBalance} </label> */}
-                                    <label className="nav-link name" href="#">Welcome : {userfullName} </label>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link" href="https://wallet.remelife.com/"> Logout <i class="fas fa-sign-out-alt"></i> </a>
-                                </li>
-                            </ul>
+                        <div className="container-fluid wrapper">
+                            <Sidebar />
+                            <div className="main-panel">
+                                <Switch >
+                                    <Route exact path='/team' exact component={Team} />
+                                    <Route exact path='/home' component={Dashboard} />
+                                </Switch>
+                            </div>
                         </div>
-                    </nav>
-                </div>
-                <div className="container-fluid wrapper">
-                    <Sidebar />
-                    <div className="main-panel">
-                        <Switch >
-                            <Route exact path='/team' exact component={Team} />
-                            <Route exact path='/home' component={Dashboard} />
-                        </Switch>
                     </div>
+                    <div className="terms-links"><a href="https://remelife.com/" target="_blank">ReMeLife</a> | <a
+                        href="https://remelife.com/terms-and-conditions/" target="_blank">Terms & Conditions</a></div>
+                </section>
                 </div>
             </>
         );

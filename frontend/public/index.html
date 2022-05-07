@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <link rel="icon" href="https://wallet.remelife.com/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="ReMe RRP Referral Program" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
@@ -47,6 +47,29 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+  <script>
+    document.onload = function (){
+
+    }
+    function menuFunction() {
+      alert('hi')
+    }
+
+
+    function popupFunction() {
+      var x = document.getElementById("hover_bkgr_fricc");
+      if (x.style.display === "block") {
+        x.style.display = "none";
+      } else {
+        x.style.display = "block";
+      }
+    }
+
+    function closepopupFunction() {
+      var x = document.getElementById("hover_bkgr_fricc");
+      x.style.display = "none";
+    }
+  </script>
 </body>
 
 </html>

@@ -88,7 +88,9 @@ _referral.addWithReferral = async function (req, res) {
             results = await qb.insert('referred_user', { uid: uid, referred_by: referred_by });
             if (results.affected_rows === 1) {
                 const user = await qb.get_where('referred_user', { uid: uid });
+                console.log("EXIT form getwithreferal before")
                 manageUserIncome(user[0]);
+                console.log("EXIT form getwithreferal")
                 res.status(200).json({
                     success: true,
                     data: user[0]
@@ -123,9 +125,13 @@ async function manageUserIncome(user) {
         console.log('referral in userincome =>', distributions)
         let distributionsData = distributions[0];
         let main_amount = distributionsData.main_amount;
-        let level_1_amount = getAmountByPer(main_amount, distributionsData.level_1_per);
-        let level_2_amount = getAmountByPer(main_amount, distributionsData.level_2_per);
-        let level_3_amount = getAmountByPer(main_amount, distributionsData.level_3_per);
+        //let main_amount = 0;
+        // let level_1_amount = getAmountByPer(main_amount, distributionsData.level_1_per);
+        let level_1_amount =  distributionsData.level_1_per;
+        // let level_2_amount = getAmountByPer(main_amount, distributionsData.level_2_per);
+        let level_2_amount =  distributionsData.level_2_per;
+        // let level_3_amount = getAmountByPer(main_amount, distributionsData.level_3_per);
+        let level_3_amount = distributionsData.level_3_per;
         await qb.insert('user_income', { uid: uid, amount: distributions[0].main_amount, new: true });
         console.log('userincome insertion with uid')
         let l1 = await qb.select('referred_by').where({ uid: uid }).get('referred_user');
@@ -137,20 +143,25 @@ async function manageUserIncome(user) {
             let l2 = await qb.select('referred_by').where({ uid: l1_uid[0].uid }).get('referred_user');
             console.log('refererd_by l2', l2)
             if (l2.length > 0) {
+                console.log('refererd_by l2 length')
                 let l2_uid = await qb.select('uid').where({ referral_code: l2[0].referred_by }).get('user_referral_code');
                 await qb.insert('user_income', { uid: l2_uid[0].uid, amount: level_2_amount, level: 2, from_user: uid });
                 let l3 = await qb.select('referred_by').where({ uid: l2_uid[0].uid }).get('referred_user');
                 if (l3.length > 0) {
+                    console.log("refered by ll3")
                     let l3_uid = await qb.select('uid').where({ referral_code: l3[0].referred_by }).get('user_referral_code');
                     await qb.insert('user_income', { uid: l3_uid[0].uid, amount: level_3_amount, level: 3, from_user: uid });
                 }
+                console.log("EXIT form getwithreferal 1 150")
             }
+            console.log("EXIT form getwithreferal 2 152")
         }
     }
     catch (err) {
         console.error("error " + err);
     }
     finally {
+        console.log("EXIT form relase 2 152")
         if (qb) qb.release();
     }
 }
@@ -207,14 +218,14 @@ async function calculateBalance(uid) {
 }
 
 _referral.getMyBalance = async function (req, res) {
-    console.log('get balance from rrp-latest')
+    console.log('get balance from rrp-latverifyTokenest')
     try {
-        //let uid = req.params.id;
-        //let currunt_balance = await calculateBalance(uid);
+        let uid = req.params.id;
+        let currunt_balance = await calculateBalance(uid);
         res.status(200).json({
             success: true,
             data: {
-                balance: 100
+                balance: currunt_balance
             }
         });
     }
@@ -470,20 +481,25 @@ _referral.getWithdrawalHistory = async function (req, res) {
 };
 
 _referral.verifyToken = async function (req, res) {
+    console.log(req, res, '====from verfiy token jwt')
     try {
         console.log("Hello I am from referal")
         let token = req.body.jwt;
         token = await getJwt(token)
-        var cert = fs.readFileSync(path.resolve('app/controllers/referral/publicv2.pem'))  // get public key
+        var cert = fs.readFileSync(path.resolve('app/controllers/referral/SSODevkey.pem'))  // get public key
+        console.log("here is token in refereall", token.token)
         jwt.verify(token.token, cert, { algorithms: ['RS512'] }, function (err, payload) {
             // if token alg != RS256,  err == invalid signature
+            console.log('before if else ... ')
             if (err) {
+                console.log("verifiy token in referal", err)
                 res.status(200).json({
-                    success: false,
+                    success: true,
                     error: err
                 });
             }
             else {
+                console.log("verifiy token in referal success")
                 res.status(200).json({
                     success: true,
                     result: { ...payload, wallet: token.wallet },
@@ -516,24 +532,30 @@ const getJwtToken = async (token) => {
 }
 _referral.getUserDetails = async function (req, res) {
     let qb;
+    console.log("getting user details from getUserDetails _.")
+    console.log('=======HEaders=====')
+    console.log(req.headers)
+    console.log('============')
+
+
     try {
         let uid = req.params.id;
         await axios.get(process.env.REMELIFE_API_URL + uid,
             {
                 headers: {
-                    Authorization: await getJwtToken(req.headers.authorization)
+                    Authorization: await getJwtToken(req.headers.authorization),
                 }
             })
             .then(response => {
+                console.log('data', response.data)
                 res.status(200).json({
                     success: true,
                     data: response.data
                 });
-            })
-
+            }).catch((err) => console.log(err, 'this is from the core api'))
     }
     catch (err) {
-        console.error("error " + err);
+        console.error("error " + err.toString());
     }
 };
 

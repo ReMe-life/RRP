@@ -2,7 +2,12 @@ import React, { Component } from 'react'
 import * as ReferralService from "../../services/referral.sevice";
 import { CREDIT_HISTORY, USER_UID, USER_INCOME, USER_DETAILS, REFERRAL_CODE, USER_TOKEN, USER_BALANCE, USER_FULL_NAME } from '../../redux/constants/action';
 import { connect } from 'react-redux';
+import viewIcon from '../../assets/images/view-icon.png'
+import copyIcon from '../../assets/images/copy.svg'
+import viewIconPink from '../../assets/images/view-icon-pink.png'
 import Loader from '../../components/loader';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import moment from 'moment';
 import {
     FacebookShareButton,
@@ -49,7 +54,7 @@ export class Dashboard extends Component {
                 // showNotification("danger", ERRORMSG);
             });
 
-        await ReferralService.getUserInfo(this.props.uid)
+        await ReferralService.getUserInfo()
             .then((response) => {
                 response = response.data;
                 if (response.success) {
@@ -149,84 +154,50 @@ export class Dashboard extends Component {
         return (
             <>
                 <div className="row">
-                    <div className="col-md-6">
-                        <p className="welcome-line">Welcome : {userfullName}</p>
-                    </div>
-                    <div className="col-md-6">
-                        <p className="welcome-line text-right">
-                            <span>Your Wallet Address: </span>
-                            <span > {userDetails ? userDetails.wallet : '---'}</span>
-                        </p>
-                    </div></div>
-
-                <div className="bar-info-col">
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="row">
-                                <div className="col-md-12 social_icons_underAddress_style">
-                                    <TwitterShareButton url={refferalCode}><TwitterIcon className="socialIcon" size={50} /></TwitterShareButton>
-                                    <FacebookShareButton url={refferalCode}><FacebookIcon className="socialIcon" size={50} /></FacebookShareButton>
-                                    <PinterestShareButton url={refferalCode} media="https://wallet.remelife.com/static/media/reme-logo-dark.2bebd896.svg"> <PinterestIcon className="socialIcon" size={50} /></PinterestShareButton>
-                                    <WhatsappShareButton url={refferalCode}><WhatsappIcon className="socialIcon" size={50} /></WhatsappShareButton>
-                                    <LinkedinShareButton url={refferalCode}><LinkedinIcon className="socialIcon" size={50} /></LinkedinShareButton>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="value-col custom">
-
-                                <div className="light-pink-bg float-right">
-                                    <p className="welcome-line">
-                                        <span>Earn CAPS when you increase the size of your network.
-                                              Email the invitation link or click to share on your social media to invite family, friends, contacts to become ReMeLife Members.</span>
-                                    </p>
-                                    <p>
-                                        To view an email you can copy and paste to send to contact, please <a onClick={'#'}>Click here</a>.
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+                    <div className="wallet-title"><span className="message">Hi,  {userfullName} </span></div>
+                    <div className="address-wrapper" style={{marginTop: "3rem"}}>Your Wallet
+                        address: <span>{userDetails ? userDetails.wallet : '---'}</span></div>
                 </div>
 
                 <div className="card card-plain bg-white mt-4">
                     <div className="card-header">
                         <div className="row mb-3">
                             <div className="col-md-6">
-                                <h4 className="card-title heading">Level Incomes</h4>
+                                <h4 className="card-title heading">Registrations and CAPs Earned</h4>
                             </div>
                             <div className="col-md-6">
                                 <div className="income-info-btns light-pink-bg float-right">
-                                    <p>
-                                        <span className="white-text">Total CAPS earned :</span>
-                                        <span className="white-text"> {userIncome} </span>
-                                    </p>
+                                    <span className="white-text">Total CAPS earned :</span><span
+                                    className="white-text"> {userIncome}  </span>
                                 </div>
                             </div>
                         </div>
-
-                    </div><div className="card-body"><div className="table-responsive topup">
-                        {!loading ? <table id="" className="table tablesorter topup-table">
-                            <thead className="text-primary">
-                                <tr><th>No.</th>
-                                    <th>Id</th>
-                                    <th>Date</th>
-                                    <th>From User </th>
-                                    <th>Level</th>
-                                    <th className="text-center">Amount(CAPS)</th>
+                    </div>
+                    <div className="card-body">
+                        <div className="table-responsive topup">
+                            {!loading ? <table id="" className="table tablesorter topup-table">
+                                <thead className="text-primary">
+                                <tr>
+                                    <th>Member No.</th>
+                                    <th className="dt">Member Id</th>
+                                    <th className="dt">Date Joined</th>
+                                    <th className="dt">Level No.</th>
+                                    <th className="text-center">CAPs Earned</th>
+                                    <th className="dt last">From User </th>
+                                    <th className="mob last">View</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
                                 {usersArray && usersArray.length ?
                                     usersArray.map((history, index) =>
                                         <tr key={index}>
                                             <td>{index + 1}</td>
-                                            <td>{history.id}</td>
-                                            <td>{moment(history.time).format('MM/DD/YYYY HH:MM A')}</td>
-                                            <td>{history.uid}{history.level == 0 ? ' (You)' : ''}</td>
-                                            <td>{history.level}</td>
-                                            <td className="text-center">{history.amount}</td>
+                                            <td className="dt">{history.id}</td>
+                                            <td className="dt">{moment(history.time).format('MM/DD/YYYY HH:MM A')}</td>
+                                            <td className="dt">{history.level}</td>
+                                            <td>{history.amount}</td>
+                                            <td className="dt last">{history.uid}{history.level == 0 ? ' (You)' : ''}</td>
+                                            <th className="mob last">View</th>
                                         </tr>
                                     ) : <tr>
                                         <td />
@@ -238,9 +209,63 @@ export class Dashboard extends Component {
                                     </tr>
                                 }
 
-                            </tbody>
-                        </table> : <Loader />}
+                                </tbody>
+                            </table> : <Loader />}
+                        </div>
                     </div>
+                </div>
+
+                <div className="bar-info-col">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="value-col custom">
+                                <div className="light-pink-bg float-right">
+                                    <p className="welcome-line"><span>Earn CAPS when you increase the size of your network. Email the invitation link or click to share on your social media to invite family, friends, contacts to become ReMeLife Members.</span>
+                                    </p>
+                                    <p className="view-email">To view an email you can copy and paste to
+                                        send to contact, please Click
+                                        <Popup trigger={<a  rel='noreferrer' style={{color: 'red'}}> here </a>} modal closeOnDocumentClick>
+                                            {close => (
+                                                <div>
+                                                    <div>
+                                                        <h3>Inviting your family,friends & network to join ReMeLife</h3>
+                                                        <p>Here's some text that you can copy, paste, edit and send to your friends, in an email or using social media.</p>
+                                                        <p>Hi XXX,</p>
+                                                        <p>I’ve joined as a member of the ReMeLife Community. I think you'll find it to be of interest to you. And I’d like you to join my network.</p>
+                                                        <p>ReMeLife is an online platform that supports families and those that need to be connected, especially when care is involved. ReMeLife provides free apps and many useful services. But perhaps its most unique feature is that when you use ReMeLife’s apps to support and engage with others in your social, family and care network, you earn crypto tokens.</p>
+                                                        <p>You earn them as you do those things that you're probably doing already. And you earn them passively in background. They just appear in your wallet. Soon you’ll be able to buy products and trade them for cash.</p>
+                                                        <p>So, I'd like to invite you to join my network, and to also build your own. There are no costs, no work involved and no catches. ReMeLife just provides great free apps and a means to monetise your daily digital family and care actions, for your own benefit instead of for the tech giants.</p>
+                                                        <p>It’s simple and free. Just visit www.ReMeLife.com, have a look around and then click any ‘Join as a Member’ button (or click https://remelife.com/remelife-membership/) and follow the instructions.</p>
+                                                        <p>When you're asked during registration to register for your ReMe Wallet, you'll be asked if you were introduced by anyone (that's me). Please then enter this Referral link URL, so you’ll join only my network: https://wallet.remelife.com/registration/E922J624C????? (enter yours as provided in your wallet).</p>
+                                                        <p>That’s it. Do get in touch if you want to learn more about it all.</p>
+                                                        <p>Best wishes, XXX</p>
+                                                        <h6>It's as easy as that. You'll be earning rewards in no time.</h6>
+                                                    </div>
+                                                    <CopyToClipboard text={"hello this is from copy"} onCopy={() => this.setState({ copied: true })}>
+                                                        <img src={copyIcon} alt="copy-icon"/>
+                                                    </CopyToClipboard>
+                                                    {copied ? <span style={{ color: '#EB7573' }}> Copied.</span> : null}
+                                                    <a className="close" onClick={close}>
+                                                        &times;
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </Popup>.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-12">
+                            <div className="row">
+                                <div className="col-md-12 social_icons_underAddress_style">
+                                    <TwitterShareButton url={refferalCode}><TwitterIcon className="socialIcon" size={50} /></TwitterShareButton>
+                                    <FacebookShareButton url={refferalCode}><FacebookIcon className="socialIcon" size={50} /></FacebookShareButton>
+                                    <PinterestShareButton url={refferalCode} media="https://wallet.remelife.com/static/media/reme-logo-dark.2bebd896.svg"> <PinterestIcon className="socialIcon" size={50} /></PinterestShareButton>
+                                    <WhatsappShareButton url={refferalCode}><WhatsappIcon className="socialIcon" size={50} /></WhatsappShareButton>
+                                    <LinkedinShareButton url={refferalCode}><LinkedinIcon className="socialIcon" size={50} /></LinkedinShareButton>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </>

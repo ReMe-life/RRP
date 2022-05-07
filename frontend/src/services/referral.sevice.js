@@ -83,7 +83,7 @@ export const verifyToken = async (body) => {
     return await api
         .PostReq(routes.verifyToken, body)
         .then((response) => {
-            console.log("verfiytoken api referal.serveric --", response)
+            console.log("verfiytoken api referal.serveric --")
             return response;
         })
         .catch((err) => { });
@@ -91,7 +91,7 @@ export const verifyToken = async (body) => {
 
 export const getUserInfo = async (id) => {
     return await api
-        .getReq(routes.getUserDetails + '/' + id)
+        .getReq(routes.getUserDetails + '/' + getUID())
         .then((response) => {
             console.log("getuserdetails api referal.serveric --", response)
             return response;

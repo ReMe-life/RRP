@@ -45,7 +45,6 @@ export class Team extends Component {
         await ReferralService.verifyToken(body)
             .then(async (response) => {
                 response = response.data;
-                console.log("verifiytoken")
                 if (response.success) {
                     console.log("verifiytoken -- success")
                     console.log(response.result)
@@ -66,7 +65,7 @@ export class Team extends Component {
                     })
                 } else {
                     console.log("verifiytoken -- else ...")
-                    alert('invalid or expired token!!')
+                    alert('invalid or expired token!! team')
                 }
             })
             .catch((err) => {
@@ -324,9 +323,9 @@ export class Team extends Component {
 
                 <div className="row">
                     <div className="col-md-3 text-left treeDiv">
-                        <h5>{userfullName} Network</h5>
+                        <h5 className="network-title">{userfullName} Network</h5>
                         <h5>Total Number of Members in your ReMeLife Network</h5>
-                        <h5 className='text-primary-bg'>{ refferalTeamListToShow.length ? refferalTeamListToShow.length : 0 }</h5>
+                        <h5 className='text-primary-bg network-number'>{ refferalTeamListToShow.length ? refferalTeamListToShow.length : 0 }</h5>
                         <div className="referedUser">
                             <div className="headSec">
                                 <h2>Referred Users</h2>
@@ -395,21 +394,21 @@ export class Team extends Component {
                     <div className="col-md-3 levelSec">
                         <ul className="levelSec">
                             <li>
-                                <span>Level 0</span><a>1<br />member</a>
+                                <span>Level 0<br /><span className="captionCaps">200 CAPs for Registration</span></span><a>1<br />member</a>
                             </li>
                             <li onClick={() => this.getReffrealsHierarchyByLevel(1)} >
-                                <span>Level 1</span><a className={`${activeLevel === 1 ? 'isBtnActive' : ''}`} >{level_1}<br />member</a>
+                                <span>Level 1<br /><span className="captionCaps">100 CAPs per Member</span></span><a className={`${activeLevel === 1 ? 'isBtnActive' : ''}`} >{level_1}<br />members</a>
                             </li>
                             <li onClick={() => this.getReffrealsHierarchyByLevel(2)}>
-                                <span>Level 2</span><a className={`${activeLevel === 2 ? 'isBtnActive' : ''}`} >{level_2}<br />member</a>
+                                <span>Level 2<br /><span className="captionCaps">50 CAPs per Member</span></span><a className={`${activeLevel === 2 ? 'isBtnActive' : ''}`} >{level_2}<br />members</a>
                             </li>
                             <li onClick={() => this.getReffrealsHierarchyByLevel(3)}>
-                                <span>Level 3</span><a className={`${activeLevel === 3 ? 'isBtnActive' : ''}`} >{level_3}<br />member</a>
+                                <span>Level 3<br /><span className="captionCaps">25 CAPs per Member</span></span><a className={`${activeLevel === 3 ? 'isBtnActive' : ''}`} >{level_3}<br />members</a>
                             </li>
                         </ul>
                     </div>
                     <div className="col-md-6 treeSec">
-
+                        <h5 className="diagram-title">Diagrammatic representation of a network</h5>
                         <ul className="visualizer-container level1">
                             <li>
                                 <span className="sorting level1Icon"><img src={level1Icon} alt="icon" /></span>

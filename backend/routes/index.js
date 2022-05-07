@@ -9,18 +9,21 @@ router.get('/getReferralCode/:id', Referral.getReferralCode);
 router.get('/getUserReferralCode/:id', Referral.getUserReferralCode);
 router.post('/addWithReferral', Referral.addWithReferral);
 router.post('/setIncomeSettings', Referral.setIncomeSettings);
-router.get('/getMyBalance/:id', Auth.authenticate, Referral.getMyBalance);
-router.get('/getTotalIncome/:id', Auth.authenticate, Referral.getTotalIncome);
-router.get('/getMyReferrals/:id', Auth.authenticate, Referral.getMyReferrals);
-router.get('/getMyReferralsCount/:id', Auth.authenticate, Referral.getMyReferralsCount);
-router.get('/getCreditHistory/:id', Auth.authenticate, Referral.getCreditHistory);
-router.get('/getWithdrawalHistory/:id', Auth.authenticate, Referral.getWithdrawalHistory);
-router.get('/getReffrealsHierarchy/:id', Auth.authenticate, Referral.getReffrealsHierarchy);
-router.get('/getReffrealsHierarchyByLevel/:id/:level', Auth.authenticate, Referral.getReffrealsHierarchyByLevel);
-router.get('/getLevelUsers/:id', Auth.authenticate, Referral.getLevelUsers);
-router.post('/withdrawal/:id', Auth.authenticate, Referral.withdrawal);
+
+// add Auth.authenticate into all get requests
+router.get('/getMyBalance/:id', Referral.getMyBalance);
+router.get('/getTotalIncome/:id', Referral.getTotalIncome);
+router.get('/getMyReferrals/:id', Referral.getMyReferrals);
+router.get('/getMyReferralsCount/:id', Referral.getMyReferralsCount);
+router.get('/getCreditHistory/:id', Referral.getCreditHistory);
+router.get('/getCreditHistory/:id', Referral.getCreditHistory);
+router.get('/getWithdrawalHistory/:id', Referral.getWithdrawalHistory);
+router.get('/getReffrealsHierarchy/:id', Referral.getReffrealsHierarchy);
+router.get('/getReffrealsHierarchyByLevel/:id/:level', Referral.getReffrealsHierarchyByLevel);
+router.get('/getLevelUsers/:id', Referral.getLevelUsers);
+router.post('/withdrawal/:id', Referral.withdrawal);
 router.post('/verifyToken', Referral.verifyToken);
-router.get('/getUserDetails/:id', Auth.authenticate, Referral.getUserDetails)
+router.get('/getUserDetails/:id', Referral.getUserDetails)
 
 
 

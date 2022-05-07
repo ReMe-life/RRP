@@ -1,8 +1,8 @@
 const hostname = window.location.hostname;
 
 const api = {
-  localhost: "http://localhost:9000/",
-  platform: "https://ws-rrp.remelife.com/"
+  localhost: "https://rrp.staging.remelife.com",
+  platform: "https://rrp.staging.remelife.com"
 };
 
 let apiBase = "";
